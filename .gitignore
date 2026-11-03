@@ -1,0 +1,29 @@
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# IDE and Editor directories
+.idea/
+.vscode/
+*.iml
+*.sublime-project
+*.sublime-workspace
+
+# Backend / Java Maven
+backend/target/
+backend/*.log
+backend/.mvn/timing.properties
+
+# Frontend / Node
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment and Credentials
+.env
+.env.local
+.env.*.local

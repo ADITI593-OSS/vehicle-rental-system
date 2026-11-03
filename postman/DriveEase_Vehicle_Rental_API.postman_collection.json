@@ -1,0 +1,506 @@
+{
+  "info": {
+    "_postman_id": "c88f1d24-3420-4ee0-8bbf-driveease-rentals",
+    "name": "DriveEase Rentals - Vehicle Rental System API Collection",
+    "description": "Complete Postman collection for DriveEase Rentals full-stack application covering Auth, Vehicles, Bookings, Returns, and Admin Dashboard.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/api",
+      "type": "string"
+    },
+    {
+      "key": "customerToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Customer Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Aman Verma\",\n  \"email\": \"aman@gmail.com\",\n  \"mobileNumber\": \"9876501234\",\n  \"password\": \"customer123\",\n  \"confirmPassword\": \"customer123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Customer Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('customerToken', jsonData.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"rahul@gmail.com\",\n  \"password\": \"customer123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "pm.collectionVariables.set('adminToken', jsonData.token);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@driveease.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get Current Authenticated User (/auth/me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "me"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Vehicles (Public & Browsing)",
+      "item": [
+        {
+          "name": "List All Vehicles (Public - Masked Reg)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/vehicles",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicles"]
+            }
+          }
+        },
+        {
+          "name": "Filter Vehicles (Cars / Two-Wheelers)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/vehicles?category=CAR&subCategory=SUV&sortBy=price_asc",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicles"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "CAR"
+                },
+                {
+                  "key": "subCategory",
+                  "value": "SUV"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "price_asc"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Calculate Price & Availability Quote",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehicleId\": 4,\n  \"pickupDatetime\": \"2026-10-25T10:00:00\",\n  \"expectedReturnDatetime\": \"2026-10-25T20:00:00\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/vehicles/calculate-price",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicles", "calculate-price"]
+            }
+          }
+        },
+        {
+          "name": "Search Available Vehicles For Dates",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/vehicles/search?category=CAR&pickup=2026-10-25T10:00:00&returnTime=2026-10-26T10:00:00&location=Mumbai",
+              "host": ["{{baseUrl}}"],
+              "path": ["vehicles", "search"],
+              "query": [
+                {
+                  "key": "category",
+                  "value": "CAR"
+                },
+                {
+                  "key": "pickup",
+                  "value": "2026-10-25T10:00:00"
+                },
+                {
+                  "key": "returnTime",
+                  "value": "2026-10-26T10:00:00"
+                },
+                {
+                  "key": "location",
+                  "value": "Mumbai"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Bookings (Customer)",
+      "item": [
+        {
+          "name": "Create Booking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehicleId\": 10,\n  \"pickupDatetime\": \"2026-10-26T09:00:00\",\n  \"expectedReturnDatetime\": \"2026-10-28T09:00:00\",\n  \"pickupLocation\": \"Hitec City, Hyderabad\",\n  \"dropLocation\": \"Hitec City, Hyderabad\",\n  \"notes\": \"Weekend family road trip\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings"]
+            }
+          }
+        },
+        {
+          "name": "Test Overlapping Booking Prevention (Must Fail 400)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"vehicleId\": 10,\n  \"pickupDatetime\": \"2026-10-27T10:00:00\",\n  \"expectedReturnDatetime\": \"2026-10-27T18:00:00\",\n  \"pickupLocation\": \"Hitec City, Hyderabad\",\n  \"dropLocation\": \"Hitec City, Hyderabad\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings"]
+            }
+          }
+        },
+        {
+          "name": "Get My Bookings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/bookings/my-bookings",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings", "my-bookings"]
+            }
+          }
+        },
+        {
+          "name": "Cancel Booking (PATCH)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/bookings/1/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["bookings", "1", "cancel"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Vehicle Returns (Admin)",
+      "item": [
+        {
+          "name": "Get Pending Returns",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/returns/pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "returns", "pending"]
+            }
+          }
+        },
+        {
+          "name": "Process Return with Late Fee & Deposit Refund",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"actualReturnDatetime\": \"2026-10-28T12:00:00\",\n  \"vehicleCondition\": \"GOOD\",\n  \"odometerReading\": 19200,\n  \"damageNotes\": \"Normal highway driving, tank refilled\",\n  \"additionalCharges\": 0,\n  \"depositRefundStatus\": \"FULLY_REFUNDED\",\n  \"returnedBy\": \"Admin Staff\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/returns/2",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "returns", "2"]
+            }
+          }
+        },
+        {
+          "name": "Get All Return Settlement Records",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/returns",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "returns"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Admin Dashboard & Fleet Management",
+      "item": [
+        {
+          "name": "Get Dashboard Summary KPIs & Charts Data",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/dashboard/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "dashboard", "summary"]
+            }
+          }
+        },
+        {
+          "name": "Add Vehicle (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"brand\": \"Mahindra\",\n  \"model\": \"Thar 4x4\",\n  \"registrationNumber\": \"MH-02-TR-9999\",\n  \"category\": \"CAR\",\n  \"subCategory\": \"SUV\",\n  \"fuelType\": \"Diesel\",\n  \"transmission\": \"Automatic\",\n  \"seatingCapacity\": 4,\n  \"pricePerHour\": 300.00,\n  \"pricePerDay\": 3200.00,\n  \"securityDeposit\": 5000.00,\n  \"location\": \"Andheri West, Mumbai\",\n  \"imageUrl\": \"https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=800&q=80\",\n  \"vehicleStatus\": \"AVAILABLE\",\n  \"description\": \"Iconic off-roader with convertible top and 4x4 capability.\",\n  \"features\": \"4x4 Drive, Touchscreen Display, Roll Cage, Removable Roof\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/vehicles",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "vehicles"]
+            }
+          }
+        },
+        {
+          "name": "Update Vehicle Status (Maintenance / Available)",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"MAINTENANCE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/admin/vehicles/1/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "vehicles", "1", "status"]
+            }
+          }
+        },
+        {
+          "name": "Get Customer Directory",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/customers",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "customers"]
+            }
+          }
+        },
+        {
+          "name": "Toggle Customer Account Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/customers/2/toggle-status",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "customers", "2", "toggle-status"]
+            }
+          }
+        },
+        {
+          "name": "Test Unauthorized Admin Access (Must Fail 403)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/admin/dashboard/summary",
+              "host": ["{{baseUrl}}"],
+              "path": ["admin", "dashboard", "summary"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
